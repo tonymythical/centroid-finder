@@ -1,4 +1,4 @@
-eee
+## Matthew
 
 Read through ImageSummaryApp in detail with your partner. Understand what each part does. This will involve looking through and reading ALL of the other classes records and interfaces. This will take a long time, but it is worth it! Do not skimp on this part, you will regret it! Also look at the sampleInput and sampleOutput folders to understand what comes in and what goes out.
 
@@ -11,3 +11,7 @@ Conclusion: The ImageSummaryApp file utilizes three parameters to customize its 
 
 1: File checks for proper argument structure. (Threshold, Image, Color)
 2: Two custom actors, the ColorDistanceFinder and DistanceImageBinarizer work to 
+
+## Anthony
+It appears we are searching for three items specifically, `<input_image>` `<hex_target_color>` `<threshold>`
+We want to take a .png file and binarize it into something requiring a Depth-First-Search.
