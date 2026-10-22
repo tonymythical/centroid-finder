@@ -1,4 +1,7 @@
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
 
 public class DfsBinaryGroupFinder implements BinaryGroupFinder {
    /**
@@ -30,7 +33,41 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
     */
     @Override
     public List<Group> findConnectedGroups(int[][] image) {
+        //Null references and 0 lengths addressed, code can proceed assuming valid values.
+        if(image == null || image.length == 0) throw new NullPointerException("");
+        for(int[] n : image) {
+            if(n == null || n.length == 0) throw new NullPointerException("");
+        }
+        //Null check block complete.
+
+        List<Group> groups = new LinkedList<>();
+
         return null;
     }
+
+    private int[] computeAverageOfList(List<Group> groups) {
+        Set<Integer> visitedCols = new HashSet<>();
+        Set<Integer> visitedRows = new HashSet<>();
+        for(Group group : groups){
+            int x = group.centroid().x();
+            int y = group.centroid().y();
+            //Going up -> down
+            if(!visitedCols.contains(x)) visitedCols.add(x);
+            if(!visitedRows.contains(x)) visitedRows.add(y);
+        }
+        int[] average = new int[2];
+        int total = 0;
+        int count = 0;
+        //Find average of columns
+        for(int n : visitedCols){ total += n; count++; }
+        average[0] = total / count; total = 0; count = 0;
+        //Find average of rows
+        for(int n : visitedRows){ total += n; count++; }
+        average[1] = total / count; total = 0; count = 0;
+        //Return array containing averages
+        return average;
+    }
     
+
+
 }
