@@ -22,7 +22,7 @@ public class EuclideanColorDistance implements ColorDistanceFinder {
         int bracket1 = getR(colorA) - getR(colorB);
         int bracket2 = getG(colorA) - getG(colorB);
         int bracket3 = getB(colorA) - getB(colorB);
-        int bracket4 = (int) Math.sqrt(((bracket1)*(bracket1)) + ((bracket2)*(bracket2)) + ((bracket3)*(bracket3)));
+        double bracket4 = Math.sqrt(((bracket1)*(bracket1)) + ((bracket2)*(bracket2)) + ((bracket3)*(bracket3)));
         return bracket4;
     }
 
