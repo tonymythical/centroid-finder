@@ -27,18 +27,12 @@ public class EuclideanColorDistance implements ColorDistanceFinder {
     }
 
     public int getR(int color){
-        String col = Integer.toString(color);
-        int num = Character.getNumericValue(col.charAt(2) + col.charAt(3));
-        return num;
+        return (color >> 16) & 0xFF;
     }
     public int getG(int color){
-        String col = Integer.toString(color);
-        int num = Character.getNumericValue(col.charAt(4) + col.charAt(5));
-        return num;
+        return (color >> 8) & 0xFF; 
     }
     public int getB(int color){
-        String col = Integer.toString(color);
-        int num = Character.getNumericValue(col.charAt(6) + col.charAt(7));
-        return num;
+        return color & 0xFF; 
     }
 }
