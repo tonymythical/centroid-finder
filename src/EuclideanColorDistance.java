@@ -19,6 +19,26 @@ public class EuclideanColorDistance implements ColorDistanceFinder {
      */
     @Override
     public double distance(int colorA, int colorB) {
-        return 0;
+        int bracket1 = getR(colorA) - getR(colorB);
+        int bracket2 = getG(colorA) - getG(colorB);
+        int bracket3 = getB(colorA) - getB(colorB);
+        int bracket4 = (int) Math.sqrt(((bracket1)*(bracket1)) + ((bracket2)*(bracket2)) + ((bracket3)*(bracket3)));
+        return bracket4;
+    }
+
+    public int getR(int color){
+        String col = Integer.toString(color);
+        int num = Character.getNumericValue(col.charAt(2) + col.charAt(3));
+        return num;
+    }
+    public int getG(int color){
+        String col = Integer.toString(color);
+        int num = Character.getNumericValue(col.charAt(4) + col.charAt(5));
+        return num;
+    }
+    public int getB(int color){
+        String col = Integer.toString(color);
+        int num = Character.getNumericValue(col.charAt(6) + col.charAt(7));
+        return num;
     }
 }
