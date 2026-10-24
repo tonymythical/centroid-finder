@@ -216,4 +216,26 @@ public class DfsBinaryGroupFinderTest {
         // sumX = 50 * (0+...+49) = 61250; 61250 / 2500 = 24
         assertGroup(groups.get(0), 2500, 24, 24);
     }
+
+    //Multiple bodies test
+    @Test
+    void multipleBodiesSeparatedByZeros() {
+        List<Group> groups = finder.findConnectedGroups(new int[][]{
+            {1, 1, 0, 1, 1},
+            {1, 1, 0, 1, 1},
+            {0, 0, 0, 0, 0},
+            {1, 0, 0, 1, 1},
+            {1, 0, 0, 0, 0}
+        });
+        assertEquals(4, groups.size());
+        // top-left 2x2: size 4, centroid (2/4, 2/4) = (0, 0)
+        assertTrue(hasGroup(groups, 4, 0, 0));
+        // top-right 2x2: size 4, centroid (14/4, 2/4) = (3, 0)
+        assertTrue(hasGroup(groups, 4, 3, 0));
+        // bottom-left vertical pair: size 2, centroid (0, 7/2) = (0, 3)
+        assertTrue(hasGroup(groups, 2, 0, 3));
+        // bottom-right horizontal pair: size 2, centroid (7/2, 3) = (3, 3)
+        assertTrue(hasGroup(groups, 2, 3, 3));
+        assertSizesDescending(groups);
+    }
 }
