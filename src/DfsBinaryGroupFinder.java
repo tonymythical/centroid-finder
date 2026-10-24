@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,33 +47,29 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
             }
         }
 
+        Collections.sort(groups, Collections.reverseOrder());
         return groups;
     }
 
     private List<Group> constructGroupFromConnected(int[][] image, int[] current, boolean[][] visited){
-        if(visited[current[0]][current[1]] == true) return new LinkedList<>();
+        if(visited[current[0]][current[1]] == true || image[current[0]][current[1]] == 0) return new LinkedList<>();
         visited[current[0]][current[1]] = true;
 
         List<Group> groups = new LinkedList<>();
-        boolean[][] visiting = new boolean[image.length][image[0].length];
-        Group madeGroup;
-
-        for(int i = 0; i < image.length; i++){
-            for(int j = 0; j < image[0].length; j++){
-                if(visiting[i][j] != true)
-                visiting[i][j] = true;
-                madeGroup = makeGroupFromCoordinate(image, new Coordinate(i, j));
-                if(!groups.contains(madeGroup)){
-                    groups.add(madeGroup);
-                }
-            }
-        }
-
+        Group madeGroup = makeGroupFromCoordinate(image, new Coordinate(current[1], current[0]), visited);
+        groups.add(madeGroup);
         return groups;
     }
 
-    private Group makeGroupFromCoordinate(int[][] image, Coordinate current) {
+    private Group makeGroupFromCoordinate(int[][] image, Coordinate current, boolean[][] visited) {
         boolean[][] visitedMap = collectVisited(image, new boolean[image.length][image[0].length], current);
+
+        for (int i = 0; i < visitedMap.length; i++) {
+            for(int j = 0; j < visitedMap[0].length; j++) {
+                if(visitedMap[i][j]) visited[i][j] = true;
+            }
+        }
+
         int spaceCount = countTrues(visitedMap);
         Coordinate centroid = getCentroid(visitedMap);
         Group result = new Group(spaceCount, centroid);
@@ -80,19 +77,21 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
     }
 
     private boolean[][] collectVisited(int[][] image, boolean[][] visited, Coordinate current){
-        if(visited[current.x()][current.y()] == true) return visited;
-        visited[current.x()][current.y()] = true;
+        if(visited[current.y()][current.x()] == true) return visited;
+        visited[current.y()][current.x()] = true;
 
         int[][] directions = {
-            {current.x() + 1, current.y()}, //down
-            {current.x(), current.y() - 1}, //left
-            {current.x() - 1, current.y()}, //up
-            {current.x(), current.y() + 1}, //right
+            {current.x() + 1, current.y()},
+            {current.x(), current.y() - 1},
+            {current.x() - 1, current.y()},
+            {current.x(), current.y() + 1},
         };
 
         for(int[] direction : directions){
-            if(image.length > direction[0] || image[0].length > direction[1]) continue;
-            visited = collectVisited(image, visited, current);
+            if(direction[0] < 0 || direction[0] >= image[0].length
+                || direction[1] < 0 || direction[1] >= image.length
+                || image[direction[1]][direction[0]] == 0) continue;
+            visited = collectVisited(image, visited, new Coordinate(direction[0], direction[1]));
         }
         return visited;
     }
@@ -108,22 +107,19 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
     }
 
     private Coordinate getCentroid(boolean[][] visited){
-        List<Integer> uniqueX = new LinkedList<>();
-        List<Integer> uniqueY = new LinkedList<>();
+        int sumX = 0;
+        int sumY = 0;
+        int totalCount = 0;
 
         for(int i = 0; i < visited.length; i++){
             for(int j = 0; j < visited[0].length; j++){
                 if(visited[i][j] == true){
-                    if(!uniqueX.contains(j)) uniqueX.add(j);
-                    if(!uniqueY.contains(i)) uniqueY.add(i);
+                  sumX += j;
+                  sumY += i;
+                  totalCount++;  
                 }
             }
         }
-        int countX = 0;
-        int countY = 0;
-        for(int n : uniqueX){ countX += n; } 
-        for(int n : uniqueY){ countY += n; }
-
-        return new Coordinate(countX / uniqueX.size(), countY / uniqueY.size());
+        return new Coordinate(sumX / totalCount, sumY / totalCount);
     }
 }
