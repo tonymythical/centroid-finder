@@ -15,3 +15,24 @@ Conclusion: The ImageSummaryApp file utilizes three parameters to customize its 
 ## Anthony
 It appears we are searching for three items specifically, `<input_image>` `<hex_target_color>` `<threshold>`
 We want to take a .png file and binarize it into something requiring a Depth-First-Search.
+We need to make sure it loads the input image using `ImageIO` and parses the hex target color into a 24 bit integer (`0xRRGGBB`).
+* Initializes the `DistanceImageBinarizer` with `EuclideanColorDistance`.
+* Generates and saves the binarized image to disk as `binarized.png`.
+* Uses `BinarizingImageGroupFinder` paired with `DfsBinaryGroupFinder` to extract connected pixel groups.
+* Iterates through the sorted list of groups and writes the summary metrics (`size,x,y`) to `groups.csv` using `group.toCsvRow()`.
+
+
+**`EuclideanColorDistance`**: Extracts red, green, and blue channels via bitwise operations (`>> 16`, `>> 8`, `& 0xFF`) and computes the 3D Euclidean distance between two color values.
+
+**`DistanceImageBinarizer`**: Converts a `BufferedImage` into a 2D integer array (1 for white, 0 for black) by checking if a pixel's Euclidean distance to the `targetColor` is strictly less than the `threshold`. Also handles converting binary arrays back to standard RGB `BufferedImage` instances.
+
+
+**`Coordinate`: A record representing an `(x, y)` coordinate where the top left is `(0, 0)`, `x` increases to the right, and `y` increases downward.
+
+`Group`: Represents a connected component with a size and a centroid `Coordinate`. Implements `Comparable<Group>` to order groups in **descending** order: first by **size**, then by **centroid x**, and finally by **centroid y**. Includes `toCsvRow()` for CSV formatting.
+
+`BinaryGroupFinder`: Defines the contract for locating contiguous blocks of `1`s in a 2D integer array using horizontal and vertical connectivity.
+
+`DfsBinaryGroupFinder`: Implements DFS traversal to group adjacent white pixels, computing integer division centroids for each group and sorting them.
+
+`BinarizingImageGroupFinder`: Implements `ImageGroupFinder` by bridging the image binarizer and binary group finder, allowing raw `BufferedImage` inputs to be processed directly into sorted `Group` lists.
