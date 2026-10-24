@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 
 public class DfsBinaryGroupFinder implements BinaryGroupFinder {
@@ -30,7 +31,99 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
     */
     @Override
     public List<Group> findConnectedGroups(int[][] image) {
-        return null;
+        //Inputs: Rectangular array of 1s and 0s
+        if(image == null) throw new NullPointerException("Error: Image passed into findConnectedGroups was read as null");
+
+        boolean[][] visited = new boolean[image.length][image[0].length];
+        List<Group> groups = new LinkedList<>();
+
+        for(int row = 0; row < image.length; row++) {
+            if(image[row] == null) throw new NullPointerException("Error: Image passed into findConnectedGroups read a pixel as null");
+            for(int col = 0; col < image[row].length; col++) {
+                for(Group n : constructGroupFromConnected(image, new int[]{row, col}, visited)){
+                    groups.add(n);
+                }        
+            }
+        }
+
+        return groups;
     }
-    
+
+    private List<Group> constructGroupFromConnected(int[][] image, int[] current, boolean[][] visited){
+        if(visited[current[0]][current[1]] == true) return new LinkedList<>();
+        visited[current[0]][current[1]] = true;
+
+        List<Group> groups = new LinkedList<>();
+        boolean[][] visiting = new boolean[image.length][image[0].length];
+        Group madeGroup;
+
+        for(int i = 0; i < image.length; i++){
+            for(int j = 0; j < image[0].length; j++){
+                if(visiting[i][j] != true)
+                visiting[i][j] = true;
+                madeGroup = makeGroupFromCoordinate(image, new Coordinate(i, j));
+                if(!groups.contains(madeGroup)){
+                    groups.add(madeGroup);
+                }
+            }
+        }
+
+        return groups;
+    }
+
+    private Group makeGroupFromCoordinate(int[][] image, Coordinate current) {
+        boolean[][] visitedMap = collectVisited(image, new boolean[image.length][image[0].length], current);
+        int spaceCount = countTrues(visitedMap);
+        Coordinate centroid = getCentroid(visitedMap);
+        Group result = new Group(spaceCount, centroid);
+        return result;
+    }
+
+    private boolean[][] collectVisited(int[][] image, boolean[][] visited, Coordinate current){
+        if(visited[current.x()][current.y()] == true) return visited;
+        visited[current.x()][current.y()] = true;
+
+        int[][] directions = {
+            {current.x() + 1, current.y()}, //down
+            {current.x(), current.y() - 1}, //left
+            {current.x() - 1, current.y()}, //up
+            {current.x(), current.y() + 1}, //right
+        };
+
+        for(int[] direction : directions){
+            if(image.length > direction[0] || image[0].length > direction[1]) continue;
+            visited = collectVisited(image, visited, current);
+        }
+        return visited;
+    }
+
+    private int countTrues(boolean[][] visited){
+        int total = 0;
+        for(boolean[] n : visited){
+            for(boolean i : n){
+                if(i == true) total++;
+            }
+        }
+        return total;
+    }
+
+    private Coordinate getCentroid(boolean[][] visited){
+        List<Integer> uniqueX = new LinkedList<>();
+        List<Integer> uniqueY = new LinkedList<>();
+
+        for(int i = 0; i < visited.length; i++){
+            for(int j = 0; j < visited[0].length; j++){
+                if(visited[i][j] == true){
+                    if(!uniqueX.contains(j)) uniqueX.add(j);
+                    if(!uniqueY.contains(i)) uniqueY.add(i);
+                }
+            }
+        }
+        int countX = 0;
+        int countY = 0;
+        for(int n : uniqueX){ countX += n; } 
+        for(int n : uniqueY){ countY += n; }
+
+        return new Coordinate(countX / uniqueX.size(), countY / uniqueY.size());
+    }
 }
