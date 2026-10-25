@@ -13,11 +13,14 @@ public class BinarizingImageGroupFinderTest {
 
     private static class FakeImageBinarizer implements ImageBinarizer {
 
+
         int[][] binaryArray = {
             {1, 1, 0},
             {1, 1, 0},
             {1, 1, 0}
         };
+
+        BufferedImage receivedImage;
         @Override public int[][] toBinaryArray(BufferedImage image) {
         return binaryArray;
     }
@@ -64,6 +67,45 @@ public class BinarizingImageGroupFinderTest {
         assertSame(fakeBinarizer.binaryArray, fakeGroupFinder.receivedArray);
 
     }
+
+    @Test
+    void testOriginalImagePassedToBinarizer() {
+        BufferedImage image = new BufferedImage(3, 3, BufferedImage.TYPE_INT_RGB);
+
+        finder.findConnectedGroups(image);
+
+        assertSame(image, fakeBinarizer.receivedImage);
+    }
+
+    @Test
+    void testCorrectedGroupsReturned() {
+        BufferedImage image = new BufferedImage(3,3, BufferedImage.TYPE_INT_RGB);
+
+        List<Group> expectedGroups = List.of(
+            new Group(6, new Coordinate(0, 1)),
+            new Group(1, new Coordinate(2, 2))
+        );
+
+        fakeGroupFinder.groupsToReturn = expectedGroups;
+
+        List<Group> actualGroups = finder.findConnectedGroups(image);
+
+        assertSame(expectedGroups, actualGroups);
+        }
+
+        @Test
+
+        void testEmptyGroupsReturned() {
+            BufferedImage image = new BufferedImage(3, 3, BufferedImage.TYPE_INT_RGB);
+
+             fakeGroupFinder.groupsToReturn = List.of();
+
+            List<Group> actualGroups = finder.findConnectedGroups(image);
+
+        assertNotNull(actualGroups);
+        assertTrue(actualGroups.isEmpty());
+
+        }
 
 
 
