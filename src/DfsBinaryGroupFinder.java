@@ -3,6 +3,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.Stack;
 import java.util.HashSet;
 
 public class DfsBinaryGroupFinder implements BinaryGroupFinder {
@@ -36,15 +37,80 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
     @Override
     public List<Group> findConnectedGroups(int[][] image) {
         //Null references and 0 lengths addressed, code can proceed assuming valid values.
-        if(image == null || image.length == 0) throw new NullPointerException("");
-        for(int[] n : image) {
-            if(n == null || n.length == 0) throw new NullPointerException("");
+        if (image == null || image.length == 0) {
+            throw new NullPointerException("Image array cannot be null or empty");
         }
-        //Null check block complete.
+        
+        int height = image.length;
+        int width = image[0].length;
 
+        for (int[] row : image) {
+            if (row == null || row.length == 0 || row.length != width) {
+                throw new NullPointerException("Image rows cannot be null, empty, or non-rectangular");
+            }
+            for (int val : row) {
+                if (val != 0 && val != 1) {
+                    throw new IllegalArgumentException("Image must contain only 1s and 0s");
+                }
+            }
+        }
+        // Null and validity check block complete.
+
+        boolean[][] visited = new boolean[height][width];
         List<Group> groups = new LinkedList<>();
 
-        return null;
+        // 4-way connectivity: up, down, left, right
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        for (int r = 0; r < height; r++) {
+            for (int c = 0; c < width; c++) {
+                if (image[r][c] == 1 && !visited[r][c]) {
+                    // Start DFS for a new connected group
+                    List<Coordinate> pixels = new LinkedList<>();
+                    Stack<int[]> stack = new Stack<>();
+
+                    stack.push(new int[]{r, c});
+                    visited[r][c] = true;
+
+                    while (!stack.isEmpty()) {
+                        int[] curr = stack.pop();
+                        int cr = curr[0];
+                        int cc = curr[1];
+
+                        // Note: x is column (cc), y is row (cr)
+                        pixels.add(new Coordinate(cc, cr));
+
+                        for (int[] dir : directions) {
+                            int nr = cr + dir[0];
+                            int nc = cc + dir[1];
+
+                            if (nr >= 0 && nr < height && nc >= 0 && nc < width) {
+                                if (image[nr][nc] == 1 && !visited[nr][nc]) {
+                                    visited[nr][nc] = true;
+                                    stack.push(new int[]{nr, nc});
+                                }
+                            }
+                        }
+                    }
+
+                    // Compute size and centroid (using integer division)
+                    int size = pixels.size();
+                    long sumX = 0;
+                    long sumY = 0;
+                    for (Coordinate p : pixels) {
+                        sumX += p.x();
+                        sumY += p.y();
+                    }
+                    int centroidX = (int) (sumX / size);
+                    int centroidY = (int) (sumY / size);
+
+                    groups.add(new Group(size, new Coordinate(centroidX, centroidY)));
+                }
+            }
+        }
+
+        groups.sort(Collections.reverseOrder());
+        return groups;
     }
 
     private int[] computeAverageOfList(List<Group> groups) {
@@ -53,14 +119,12 @@ public class DfsBinaryGroupFinder implements BinaryGroupFinder {
         for(Group group : groups){
             int x = group.centroid().x();
             int y = group.centroid().y();
-            //Going up -> down
             if(!visitedCols.contains(x)) visitedCols.add(x);
             if(!visitedRows.contains(x)) visitedRows.add(y);
         }
         int[] average = new int[2];
         int total = 0;
         int count = 0;
-        //Find average of columns
         for(int n : visitedCols){ total += n; count++; }
         average[0] = total / count; total = 0; count = 0;
         //Find average of rows
