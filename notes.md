@@ -36,3 +36,17 @@ We need to make sure it loads the input image using `ImageIO` and parses the hex
 `DfsBinaryGroupFinder`: Implements DFS traversal to group adjacent white pixels, computing integer division centroids for each group and sorting them.
 
 `BinarizingImageGroupFinder`: Implements `ImageGroupFinder` by bridging the image binarizer and binary group finder, allowing raw `BufferedImage` inputs to be processed directly into sorted `Group` lists.
+
+## Yousif
+
+BinarizingImageGroupFinder implements ImageGroupFinder and coordinates ImageBinarizer and BinaryGroupFinder. Its purpose is to transform an input image into binary data, pass that data to the grouping component, and then give the resulting groups. This avoids duplicating the DFS or color-dinstance logic. It doesn't perform DFS or calculate color dinstances itself. it delegates these operations to other methods/components.
+
+EuclideanColorDistance: Measures the color similarity
+
+DistanceImageBinarizer: Converts image into an Integer 2d array (int[][]) of 0s and 1s
+
+DfsBinaryGrouperFinder: find connected groups of 1s
+
+Group + Coordinate files: Stores group sizes and centroids
+
+groups.csv: final results
