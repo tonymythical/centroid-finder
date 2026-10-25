@@ -56,7 +56,16 @@ public class BinarizingImageGroupFinderTest {
     }
 
     @Test
-    
+    void testBinaryArrayPassedToGroupFinder() {
+        BufferedImage image = new BufferedImage(3, 3, BufferedImage.TYPE_INT_RGB);
+
+        finder.findConnectedGroups(image);
+
+        assertSame(fakeBinarizer.binaryArray, fakeGroupFinder.receivedArray);
+
+    }
+
+
 
     
 }
