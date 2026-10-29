@@ -6,6 +6,6 @@ Coordinate.class
 ImageSummaryApp.class
 BinaryGroupFinder.class
 ImageBinarizer.class
-EuclideanColorDistance.class
 ColorDistanceFinder.class
+EuclideanColorDistance.class
 Group.class
