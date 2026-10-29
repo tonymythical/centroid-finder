@@ -12,8 +12,6 @@ public class BinarizingImageGroupFinderTest {
     private BinarizingImageGroupFinder finder;
 
     private static class FakeImageBinarizer implements ImageBinarizer {
-
-
         int[][] binaryArray = {
             {1, 1, 0},
             {1, 1, 0},
@@ -21,9 +19,11 @@ public class BinarizingImageGroupFinderTest {
         };
 
         BufferedImage receivedImage;
-        @Override public int[][] toBinaryArray(BufferedImage image) {
-        return binaryArray;
-    }
+        @Override
+        public int[][] toBinaryArray(BufferedImage image) {
+            receivedImage = image;
+            return binaryArray;
+        }
     @Override
      public BufferedImage toBufferedImage(int[][] image) {
         throw new UnsupportedOperationException("Not needed for this test");
